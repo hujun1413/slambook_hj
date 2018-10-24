@@ -27,8 +27,8 @@ int main ( int argc, char** argv )
     Ptr<DescriptorMatcher> matcher  = DescriptorMatcher::create ( "BruteForce-Hamming" );
 
     //-- 第一步:检测 Oriented FAST 角点位置
-    detector->detect ( img_1,keypoints_1 );
-    detector->detect ( img_2,keypoints_2 );
+    detector->detect ( img_1,keypoints_1);//480*640, detect 500 keypoints
+    detector->detect ( img_2,keypoints_2);
 
     //-- 第二步:根据角点位置计算 BRIEF 描述子
     descriptor->compute ( img_1, keypoints_1, descriptors_1 );
@@ -47,6 +47,11 @@ int main ( int argc, char** argv )
     double min_dist=10000, max_dist=0;
 
     //找出所有匹配之间的最小距离和最大距离, 即是最相似的和最不相似的两组点之间的距离
+
+    printf("descriptors_1.rows = %d, descriptors_1.cols = %d, descriptors_2.rows = %d, descriptors_2.cols = %d, "
+           "matches.size=%d, img_1.rows = %d, img_1.cols = %d, keypoints_1.size = %d, keypoints_2.size = %d\n"
+           , descriptors_1.rows, descriptors_1.cols, descriptors_2.rows, descriptors_2.cols, (int)matches.size(), img_1.rows, img_1.cols
+           , (int)keypoints_1.size(), (int)keypoints_2.size());
     for ( int i = 0; i < descriptors_1.rows; i++ )
     {
         double dist = matches[i].distance;
@@ -68,6 +73,7 @@ int main ( int argc, char** argv )
         if ( matches[i].distance <= max ( 2*min_dist, 30.0 ) )
         {
             good_matches.push_back ( matches[i] );
+            break;
         }
     }
 
@@ -76,6 +82,8 @@ int main ( int argc, char** argv )
     Mat img_goodmatch;
     drawMatches ( img_1, keypoints_1, img_2, keypoints_2, matches, img_match );
     drawMatches ( img_1, keypoints_1, img_2, keypoints_2, good_matches, img_goodmatch );
+    cout << "x = " << keypoints_1[good_matches[0].queryIdx].pt.y << " y = " << keypoints_1[good_matches[0].queryIdx].pt.x << endl;
+    cout << "x = " << keypoints_2[good_matches[0].trainIdx].pt.y << " y = " << keypoints_2[good_matches[0].trainIdx].pt.x << endl;
     imshow ( "所有匹配点对", img_match );
     imshow ( "优化后匹配点对", img_goodmatch );
     waitKey(0);

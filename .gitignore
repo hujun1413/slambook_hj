@@ -6,3 +6,6 @@ cmake_install.cmake
 *.kdev4
 *.DS*
 .idea*
+3rdparty/*
+rgbd_dataset_freiburg1_xyz/
+*~
